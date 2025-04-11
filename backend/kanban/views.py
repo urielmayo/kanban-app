@@ -44,6 +44,13 @@ class ProjectViewSet(viewsets.ModelViewSet):
         project = serializer.save()
         project.members.add(self.request.user)
 
+    @action(detail=True, methods=['get'])
+    def members(self, request, pk=None):
+        project = self.get_object()
+        members = project.members.all()
+        serializer = UserSerializer(members, many=True)
+        return Response(serializer.data)
+
 
 class StatusViewSet(viewsets.ModelViewSet):
     serializer_class = StatusSerializer
