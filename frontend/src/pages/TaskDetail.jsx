@@ -48,7 +48,14 @@ function TaskDetail() {
   };
 
   return (
-    <Box sx={{ p: 4, backgroundColor: "#f5f5f5", minHeight: "100vh" }}>
+    <Box
+      sx={{
+        width: "100%",
+        px: 3,
+        backgroundColor: "#f5f5f5",
+        minHeight: "100vh",
+      }}
+    >
       {/* Breadcrumbs */}
       <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 2 }}>
         <MuiLink underline="hover" color="inherit" component={Link} to="/">
