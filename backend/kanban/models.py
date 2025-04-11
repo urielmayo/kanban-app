@@ -112,7 +112,7 @@ class Task(models.Model):
         related_name="tasks",
     )
     title = models.CharField(max_length=255)
-    description = models.TextField(blank=True)
+    description = models.TextField()
     assigned_to = models.ForeignKey(
         User,
         on_delete=models.SET_NULL,
