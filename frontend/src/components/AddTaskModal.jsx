@@ -1,9 +1,12 @@
 import { Dialog, DialogTitle, DialogContent } from "@mui/material";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
+
 import { createTask } from "../utils/http";
 import TaskForm from "./TaskForm";
 
 function AddTaskModal({ open, onClose, projectMembers, projectId, statusId }) {
+  const [errors, setErrors] = useState({});
   const queryClient = useQueryClient();
 
   const { mutate, isLoading: isCreatingTask } = useMutation({
@@ -13,7 +16,7 @@ function AddTaskModal({ open, onClose, projectMembers, projectId, statusId }) {
       onClose();
     },
     onError: (err) => {
-      console.error("Failed to create task:", err);
+      setErrors(err.response?.data);
     },
   });
 
@@ -29,6 +32,7 @@ function AddTaskModal({ open, onClose, projectMembers, projectId, statusId }) {
           projectMembers={projectMembers}
           onSubmit={handleSubmit}
           isSubmitting={isCreatingTask}
+          errors={errors}
         />
       </DialogContent>
     </Dialog>

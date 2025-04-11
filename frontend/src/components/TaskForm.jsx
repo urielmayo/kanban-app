@@ -6,6 +6,7 @@ import {
   Autocomplete,
   Button,
   CircularProgress,
+  FormHelperText,
 } from "@mui/material";
 import MDEditor from "@uiw/react-md-editor";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
@@ -21,6 +22,7 @@ function TaskForm({
   projectMembers = [],
   onSubmit,
   isSubmitting,
+  errors,
 }) {
   const [taskForm, setTaskForm] = useState(() => ({
     title: initialData.title || "",
@@ -35,12 +37,8 @@ function TaskForm({
     queryKey: ["templates"],
   });
 
-  const handleSubmit = () => {
-    if (!taskForm.title || !taskForm.deadline) {
-      console.error("Form validation failed. Required fields missing.");
-      return;
-    }
-
+  const handleSubmit = (e) => {
+    e.preventDefault();
     const taskPayload = {
       title: taskForm.title,
       description: taskForm.description,
@@ -49,7 +47,6 @@ function TaskForm({
         : null,
       assigned_to: taskForm.assigned_to || null,
     };
-
     onSubmit(taskPayload);
   };
 
@@ -58,14 +55,19 @@ function TaskForm({
   }
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", gap: 2, pt: 2 }}>
+    <Box
+      sx={{ display: "flex", flexDirection: "column", gap: 2, pt: 2 }}
+      component="form"
+      onSubmit={handleSubmit}
+    >
       <TextField
         sx={{ backgroundColor: "white" }}
         label="Task Title"
         fullWidth
-        required
         value={taskForm.title}
         onChange={(e) => setTaskForm({ ...taskForm, title: e.target.value })}
+        error={!!errors.title}
+        helperText={errors.title}
       />
       <Autocomplete
         options={templates}
@@ -84,8 +86,11 @@ function TaskForm({
         onChange={(value) =>
           setTaskForm({ ...taskForm, description: value || "" })
         }
-        preview="edit"
+        preview="live"
       />
+      {!!errors.description && (
+        <FormHelperText error>{errors.description}</FormHelperText>
+      )}
       <Typography variant="caption" display="block">
         Markdown supported -{" "}
         <Link
@@ -104,6 +109,8 @@ function TaskForm({
             setTaskForm({ ...taskForm, deadline: newValue })
           }
           slotProps={(params) => <TextField {...params} fullWidth required />}
+          error={!!errors.deadline}
+          helperText={errors.deadline}
         />
       </LocalizationProvider>
       <Autocomplete
@@ -124,11 +131,7 @@ function TaskForm({
         renderInput={(params) => <TextField {...params} label="Assign To" />}
       />
       <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2 }}>
-        <Button
-          onClick={handleSubmit}
-          variant="contained"
-          disabled={isSubmitting}
-        >
+        <Button type="submit" variant="contained" disabled={isSubmitting}>
           {isSubmitting ? <CircularProgress size={24} /> : "Submit"}
         </Button>
       </Box>
