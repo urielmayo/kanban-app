@@ -17,3 +17,6 @@ jobs:
 
       - name: Run tests
         run: make tests
+
+      - name: Check for missing migrations
+        run: docker compose -f docker-compose.dev.yaml run --rm backend makemigrations --check --dry-run
