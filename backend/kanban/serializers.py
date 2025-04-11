@@ -133,6 +133,10 @@ class ProjectSerializer(serializers.ModelSerializer):
         ]
 
     def validate_statuses(self, value):
+        if not value:
+            raise serializers.ValidationError(
+                "There should be at least one status"
+            )
         seen_statuses = set()
         seen_orders = set()
         errors = []
