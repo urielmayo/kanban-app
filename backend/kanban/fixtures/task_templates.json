@@ -1,0 +1,34 @@
+[
+  {
+    "model": "kanban.tasktemplate",
+    "pk": 1,
+    "fields": {
+      "name": "New API Endpoint",
+      "content": "**Endpoint:** `{endpoint_path}`\n**Method:** `{HTTP_method | GET | POST | PUT | DELETE | PATCH}`\n**Description:** {Brief description of the endpoint's purpose}\n\n### Request\n**Authentication:** `{None | Token | Session | OAuth2}`\n**Permissions:** `{Required permissions}`\n**Headers:**\n```json\n{\n  \"Content-Type\": \"application/json\",\n  \"Authorization\": \"Bearer {token}\"\n}\n```\n**Query Parameters:**\n- `{param_name}`: `{description}` (Type: `{type}`, Required: {True/False})\n**Body:**\n```json\n{\n  \"field1\": \"{description}\",\n  \"field2\": \"{description}\"\n}\n```\n\n### Response\n**Success (2xx):**\n```json\n{\n  \"message\": \"Success\",\n  \"data\": {}\n}\n```\n**Error (4xx/5xx):**\n```json\n{\n  \"error\": \"{error_code}\",\n  \"message\": \"{error_description}\"\n}\n```\n\n### Acceptance Criteria\n- [ ] Implement endpoint logic.\n- [ ] Add unit tests.\n- [ ] Add integration tests.\n- [ ] Document the endpoint (e.g., Swagger/OpenAPI)."
+    }
+  },
+  {
+    "model": "kanban.tasktemplate",
+    "pk": 2,
+    "fields": {
+      "name": "New UI Component",
+      "content": "**Component Name:** `{ComponentName}`\n**Purpose:** {Brief description of the component's function}\n**Parent Component(s):** `{ParentComponent}`\n**State Management:** `{Local State | Context API | Redux | Zustand | etc.}`\n\n### Props\n- `{prop_name}`: `{description}` (Type: `{type}`, Required: {True/False}, Default: `{default_value}`)\n\n### State\n- `{state_variable}`: `{description}` (Initial Value: `{initial_value}`)\n\n### Functionality\n- {Description of user interactions and expected behavior}\n- {Data fetching requirements, if any}\n\n### Styling\n- Framework/Library: `{Tailwind CSS | Material UI | Bootstrap | CSS Modules | Styled Components}`\n- Key styles: {Description of appearance}\n\n### Acceptance Criteria\n- [ ] Implement component structure (JSX/TSX).\n- [ ] Implement component logic.\n- [ ] Apply styling.\n- [ ] Add unit tests (e.g., Jest/React Testing Library).\n- [ ] Add Storybook story (if applicable).\n- [ ] Ensure responsiveness across devices."
+    }
+  },
+  {
+    "model": "kanban.tasktemplate",
+    "pk": 3,
+    "fields": {
+      "name": "Database Schema Change",
+      "content": "**Reason for Change:** {Explain why the migration is needed}\n**Models Affected:**\n- `{ModelName1}`\n- `{ModelName2}`\n\n### Changes\n- **Add Field:** `{field_name}` to `{ModelName}` (Type: `{type}`, Nullable: {True/False}, Default: `{default_value}`)\n- **Remove Field:** `{field_name}` from `{ModelName}`\n- **Modify Field:** `{field_name}` in `{ModelName}` (Change: {describe change})\n- **Add Table:** `{NewModelName}` (Fields: {...})\n- **Remove Table:** `{OldModelName}`\n\n### Data Migration (if needed)\n- {Describe steps to migrate existing data}\n\n### Rollback Plan\n- {Describe how to revert the changes if necessary}\n\n### Acceptance Criteria\n- [ ] Create Django migration file (`makemigrations`).\n- [ ] Apply migration (`migrate`).\n- [ ] Test application functionality after migration.\n- [ ] Verify data integrity."
+    }
+  },
+  {
+    "model": "kanban.tasktemplate",
+    "pk": 4,
+    "fields": {
+      "name": "Bug Fix",
+      "content": "**Bug Description:** {Detailed description of the bug, including steps to reproduce}\n**Affected Area(s):** {Module, component, endpoint, etc.}\n**Expected Behavior:** {What should happen?}\n**Actual Behavior:** {What is actually happening?}\n**Root Cause Analysis (Optional):** {Initial thoughts on the cause}\n\n### Proposed Solution\n- {Describe the planned fix}\n\n### Code Changes\n- Files to modify:\n  - `{file_path_1}`\n  - `{file_path_2}`\n- Key changes: {Summary of code modifications}\n\n### Testing Plan\n- [ ] Reproduce the bug.\n- [ ] Apply the fix.\n- [ ] Verify the fix resolves the issue.\n- [ ] Check for regressions in related areas.\n- [ ] Add a test case for this specific bug.\n\n### Acceptance Criteria\n- [ ] Bug is no longer reproducible.\n- [ ] Fix is implemented correctly.\n- [ ] Relevant tests pass (including the new one).\n- [ ] No regressions introduced."
+    }
+  }
+]
