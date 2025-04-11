@@ -162,3 +162,5 @@ LOGGING = {
         },
     },
 }
+
+DRF_API_LOGGER_DATABASE = True  # Default to False
