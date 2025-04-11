@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Toaster } from "react-hot-toast";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import { AuthProvider } from "./context/AuthContext";
@@ -27,7 +28,7 @@ const theme = createTheme({
     },
     background: {
       default: "#f5f5f5", // Slightly darker light gray
-      paper: "#e5e5e5", // Slightly darker white for the navigation bar
+      paper: "white", // Slightly darker white for the navigation bar
     },
   },
   shape: {
@@ -41,17 +42,9 @@ const theme = createTheme({
         },
       },
     },
-    MuiCard: {
-      styleOverrides: {
-        root: {
-          backgroundColor: "white",
-        },
-      },
-    },
     MuiDialog: {
       styleOverrides: {
         paper: {
-          backgroundColor: "white",
           maxWidth: "90%",
           maxHeight: "75%",
           borderRadius: 16,
@@ -68,6 +61,7 @@ function App() {
         <CssBaseline />
         <Router>
           <AuthProvider>
+            <Toaster position="top-right" reverseOrder={false} />
             <Routes>
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />

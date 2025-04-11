@@ -2,6 +2,7 @@ const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 import axios from "axios";
 import { redirect } from "react-router-dom";
 import Cookies from "js-cookie";
+import toast from "react-hot-toast";
 
 const axiosInstance = axios.create({
   baseURL: BACKEND_URL,
@@ -76,6 +77,7 @@ export const getProjectDetail = async (projectId) => {
 
 export const createProject = async (data) => {
   const response = await axiosInstance.post("/api/projects/", data);
+  toast.success("Proyecto creada con éxito ✅");
   return response.data;
 };
 
@@ -98,6 +100,7 @@ export const getTask = async ({ projectId, taskId }) => {
 export const createTask = async ({ data, projectId }) => {
   const url = `/api/projects/${projectId}/tasks/`;
   const response = await axiosInstance.post(url, data);
+  toast.success("Tarea creada con éxito ✅");
   return response.data;
 };
 
