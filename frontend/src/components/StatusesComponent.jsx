@@ -14,6 +14,8 @@ import {
 } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import { getStatuses } from "../utils/http";
+import LoadingComponent from "./LoadingComponent";
+import ErrorComponent from "./ErrorComponent";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -26,12 +28,26 @@ const MenuProps = {
   },
 };
 
-function StatusesComponent({ statuses, setStatuses }) {
-  const [selectedStatuses, setSelectedStatuses] = useState(statuses);
-  const [statusOrders, setStatusOrders] = useState({});
+function createOrder(statuses) {
+  const order = {};
+  if (statuses) {
+    statuses.forEach((st) => (order[st.status.id] = st.order));
+  }
+  return order;
+}
+
+function StatusesComponent({ statuses, setStatuses, errors = [] }) {
+  const [selectedStatuses, setSelectedStatuses] = useState(
+    statuses.map((st) => ({ id: st.status.id, name: st.status.name }))
+  );
+  const [statusOrders, setStatusOrders] = useState(createOrder(statuses));
 
   // Fetch statuses using useQuery
-  const { data: availableStatuses, isLoading } = useQuery({
+  const {
+    data: availableStatuses,
+    isLoading,
+    isError,
+  } = useQuery({
     queryKey: ["status"],
     queryFn: getStatuses,
   });
@@ -57,29 +73,17 @@ function StatusesComponent({ statuses, setStatuses }) {
     );
   };
 
-  const handleOrderChange = (statusId, order) => {
-    const newOrders = { ...statusOrders, [statusId]: order };
-    setStatusOrders(newOrders);
-
-    // Update parent state
-    setStatuses(
-      selectedStatuses.map((status) => ({
-        status: status.id,
-        order: newOrders[status.id],
-      }))
-    );
-  };
-
-  if (isLoading) {
-    return <Typography>Cargando estados...</Typography>;
-  }
+  if (isLoading) return <LoadingComponent />;
+  if (isError) return <ErrorComponent />;
 
   return (
-    <Box sx={{ mt: 2 }}>
+    <Box>
       <FormControl fullWidth margin="normal">
-        <InputLabel id="statuses-label">Estados</InputLabel>
+        <InputLabel id="statuses-label">Statuses</InputLabel>
         <Select
+          required
           labelId="statuses-label"
+          label="Statuses"
           multiple
           value={selectedStatuses}
           onChange={handleStatusChange}
@@ -91,6 +95,7 @@ function StatusesComponent({ statuses, setStatuses }) {
             </Box>
           )}
           MenuProps={MenuProps}
+          error={errors.length > 0}
         >
           {availableStatuses.map((status) => (
             <MenuItem key={status.id} value={status}>
@@ -101,6 +106,7 @@ function StatusesComponent({ statuses, setStatuses }) {
             </MenuItem>
           ))}
         </Select>
+        {errors.length > 0 && <FormHelperText error>{errors}</FormHelperText>}
         <FormHelperText>
           The order is assigned based on select sequence
         </FormHelperText>
@@ -110,7 +116,7 @@ function StatusesComponent({ statuses, setStatuses }) {
           key={status.id}
           margin="normal"
           fullWidth
-          label={`Orden para ${status.name}`}
+          label={`Ordering for ${status.name}`}
           type="number"
           value={statusOrders[status.id] || ""}
           disabled
