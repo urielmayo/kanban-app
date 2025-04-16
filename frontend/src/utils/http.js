@@ -92,8 +92,8 @@ export const getProjectMembers = async (id) => {
   return response.data;
 };
 
-export const updateProject = async (id, data) => {
-  const response = await axiosInstance.put(`/api/projects/${id}`, data);
+export const updateProject = async ({ id, data }) => {
+  const response = await axiosInstance.put(`/api/projects/${id}/`, data);
   return response.data;
 };
 
