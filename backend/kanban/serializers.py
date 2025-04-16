@@ -177,11 +177,22 @@ class ProjectSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         statuses = validated_data.pop('statuses', None)
 
-        for attr, value in validated_data.items():
-            setattr(instance, attr, value)
-        instance.save()
-
         if statuses is not None:
+            current_status_ids = set(
+                instance.statuses.values_list('status_id', flat=True)
+            )
+            new_status_ids = {item["status"].id for item in statuses}
+            statuses_to_delete = current_status_ids - new_status_ids
+
+            linked_tasks = Task.objects.filter(
+                status_id__in=statuses_to_delete,
+                project=instance,
+            )
+            if linked_tasks.exists():
+                raise serializers.ValidationError(
+                    {"statuses": ["Cannot delete a status with active tasks"]}
+                )
+
             instance.statuses.all().delete()
             for item in statuses:
                 ProjectStatus.objects.create(
@@ -189,6 +200,11 @@ class ProjectSerializer(serializers.ModelSerializer):
                     status=item["status"],
                     order=item["order"],
                 )
+
+        # Actualizar los demás campos del proyecto
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
 
         return instance
 
