@@ -67,7 +67,7 @@ function TaskDetail() {
           component={Link}
           to={`/projects/${params.projectId}`}
         >
-          Current Project
+          {task.project}
         </MuiLink>
         <Typography sx={{ color: "text.primary" }}>{task.title}</Typography>
       </Breadcrumbs>

@@ -11,7 +11,7 @@ import { useState } from "react";
 
 import ProjectHeader from "../components/projectDetail/ProjectHeader";
 import StatusColumn from "../components/projectDetail/StatusColumn";
-import AddTaskModal from "../components/AddTaskModal";
+import AddTask from "../components/AddTask";
 import LoadingComponent from "../components/LoadingComponent";
 import { getProjectDetail } from "../utils/http";
 import ErrorComponent from "../components/ErrorComponent";
@@ -73,7 +73,7 @@ function ProjectDetail() {
         ))}
       </Grid>
 
-      <AddTaskModal
+      <AddTask
         open={openModal}
         onClose={handleCloseModal}
         projectId={id}

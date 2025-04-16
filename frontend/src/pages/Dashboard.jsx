@@ -29,7 +29,7 @@ function Dashboard() {
   if (isError) return <ErrorComponent />;
 
   return (
-    <Box>
+    <Box sx={{ width: "100%", px: 3 }}>
       <Box sx={{ display: "flex", justifyContent: "space-between", mb: 3 }}>
         <Typography variant="h4">Projects</Typography>
         <Link to="projects/new">

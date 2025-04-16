@@ -16,25 +16,36 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getTaskTemplates } from "../utils/http";
 import LoadingComponent from "./LoadingComponent";
+import ErrorComponent from "./ErrorComponent";
+import { useParams } from "react-router-dom";
+import { getProjectMembers } from "../utils/http";
 
-function TaskForm({
-  initialData = {},
-  projectMembers = [],
-  onSubmit,
-  isSubmitting,
-  errors,
-}) {
+function TaskForm({ initialData = {}, onSubmit, isSubmitting, errors }) {
+  const { id } = useParams();
   const [taskForm, setTaskForm] = useState(() => ({
-    title: initialData.title || "",
-    description: initialData.description || "",
+    title: initialData?.title || "",
+    description: initialData?.description || "",
     deadline: initialData.deadline ? new Date(initialData.deadline) : null,
-    assigned_to: initialData.assigned_to || "",
+    assigned_to: initialData?.assigned_to?.id || "",
     template: "",
   }));
 
-  const { data: templates, isLoading: isLoadingTemplates } = useQuery({
+  const {
+    data: templates,
+    isLoading: isLoadingTemplates,
+    isError: isErrorTemplates,
+  } = useQuery({
     queryFn: getTaskTemplates,
     queryKey: ["templates"],
+  });
+
+  const {
+    data: members,
+    isLoading: isLoadingMembers,
+    isError: isErrorMembers,
+  } = useQuery({
+    queryFn: async () => getProjectMembers(id),
+    queryKey: ["project", id, "members"],
   });
 
   const handleSubmit = (e) => {
@@ -50,9 +61,10 @@ function TaskForm({
     onSubmit(taskPayload);
   };
 
-  if (isLoadingTemplates) {
-    return <LoadingComponent />;
-  }
+  const isLoading = isLoadingMembers && isLoadingTemplates;
+
+  if (isLoading) return <LoadingComponent />;
+  if (isErrorTemplates) return <ErrorComponent />;
 
   return (
     <Box
@@ -70,6 +82,7 @@ function TaskForm({
         helperText={errors.title}
       />
       <Autocomplete
+        disabled={!templates}
         options={templates}
         getOptionLabel={(option) => option.name}
         renderInput={(params) => <TextField {...params} label="Template" />}
@@ -88,7 +101,7 @@ function TaskForm({
         }
         preview="live"
       />
-      {!!errors.description && (
+      {errors?.description && (
         <FormHelperText error>{errors.description}</FormHelperText>
       )}
       <Typography variant="caption" display="block">
@@ -114,13 +127,12 @@ function TaskForm({
         />
       </LocalizationProvider>
       <Autocomplete
+        disabled={!members}
         fullWidth
-        options={projectMembers || []}
+        options={members}
         getOptionLabel={(option) => `${option.first_name} ${option.last_name}`}
         value={
-          projectMembers?.find(
-            (member) => member.id === taskForm.assigned_to
-          ) || null
+          members?.find((member) => member.id === taskForm.assigned_to) || null
         }
         onChange={(event, newValue) => {
           setTaskForm({
