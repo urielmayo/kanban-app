@@ -62,6 +62,7 @@ class TaskTemplateSerializer(serializers.ModelSerializer):
 
 class TaskSerializer(serializers.ModelSerializer):
     template = TaskTemplateSerializer(read_only=True)
+    project = serializers.StringRelatedField()
 
     class Meta:
         model = Task
@@ -70,7 +71,11 @@ class TaskSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         res = super().to_representation(instance)
-        res['assigned_to'] = UserSerializer(instance=instance.assigned_to).data
+        res['assigned_to'] = (
+            instance.assigned_to
+            and UserSerializer(instance=instance.assigned_to).data
+            or None
+        )
         return res
 
 
