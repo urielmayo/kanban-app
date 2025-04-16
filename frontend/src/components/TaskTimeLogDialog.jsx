@@ -7,10 +7,13 @@ import {
   TextField,
   Button,
 } from "@mui/material";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 
 function TaskTimeLogDialog({ open, onClose, taskId }) {
   const [hours, setHours] = useState("");
-  const [date, setDate] = useState("");
+  const [date, setDate] = useState(null);
 
   const handleSubmit = () => {
     // Aquí puedes manejar el envío del registro de tiempo
@@ -29,16 +32,14 @@ function TaskTimeLogDialog({ open, onClose, taskId }) {
           onChange={(e) => setHours(e.target.value)}
           fullWidth
         />
-        <TextField
-          label="Date"
-          type="date"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-          fullWidth
-          InputLabelProps={{
-            shrink: true,
-          }}
-        />
+        <LocalizationProvider dateAdapter={AdapterDateFns}>
+          <DatePicker
+            label="Date"
+            value={date}
+            onChange={(newValue) => setDate(newValue)}
+            renderInput={(params) => <TextField {...params} fullWidth />}
+          />
+        </LocalizationProvider>
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Cancel</Button>
