@@ -25,3 +25,5 @@ dist-ssr
 
 venv
 *.sqlite3
+
+todos.txt
