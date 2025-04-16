@@ -5,7 +5,7 @@ import { useState } from "react";
 import { createTask } from "../utils/http";
 import TaskForm from "./TaskForm";
 
-function AddTaskModal({ open, onClose, projectMembers, projectId, statusId }) {
+function AddTask({ open, onClose, projectMembers, projectId, statusId }) {
   const [errors, setErrors] = useState({});
   const queryClient = useQueryClient();
 
@@ -39,4 +39,4 @@ function AddTaskModal({ open, onClose, projectMembers, projectId, statusId }) {
   );
 }
 
-export default AddTaskModal;
+export default AddTask;
