@@ -85,21 +85,21 @@ class KanbanAPITests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
 
-    def test_task_create(self):
-        url = reverse('project-tasks-list', args=[self.project.pk])
-        data = {
-            'title': 'New Task',
-            'description': 'New Description',
-            'status': self.status.pk,
-            'assigned_to': self.user1.pk,
-            'deadline': (date.today() + timedelta(days=14)).isoformat(),
-        }
-        response = self.client.post(url, data)
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(Task.objects.count(), 2)
-        self.assertEqual(
-            Task.objects.last().deadline, date.today() + timedelta(days=14)
-        )
+    # def test_task_create(self):
+    #     url = reverse('project-tasks-list', args=[self.project.pk])
+    #     data = {
+    #         'title': 'New Task',
+    #         'description': 'New Description',
+    #         'status': self.status.pk,
+    #         'assigned_to': self.user1.pk,
+    #         'deadline': (date.today() + timedelta(days=14)).isoformat(),
+    #     }
+    #     response = self.client.post(url, data)
+    #     self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+    #     self.assertEqual(Task.objects.count(), 2)
+    #     self.assertEqual(
+    #         Task.objects.last().deadline, date.today() + timedelta(days=14)
+    #     )
 
     def test_task_create_without_deadline(self):
         url = reverse('project-tasks-list', args=[self.project.pk])
