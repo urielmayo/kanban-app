@@ -231,6 +231,7 @@ class TaskSerializer(serializers.ModelSerializer):
             "deadline",
             "created_at",
             "timelogs",
+            "template",
         ]
         read_only_fields = ["project"]
 
