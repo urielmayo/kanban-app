@@ -60,25 +60,6 @@ class TaskTemplateSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class TaskSerializer(serializers.ModelSerializer):
-    template = TaskTemplateSerializer(read_only=True)
-    project = serializers.StringRelatedField()
-
-    class Meta:
-        model = Task
-        fields = "__all__"
-        read_only_fields = ["project"]
-
-    def to_representation(self, instance):
-        res = super().to_representation(instance)
-        res['assigned_to'] = (
-            instance.assigned_to
-            and UserSerializer(instance=instance.assigned_to).data
-            or None
-        )
-        return res
-
-
 class TaskListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Task
@@ -231,3 +212,23 @@ class TaskLogSerializer(serializers.ModelSerializer):
     class Meta:
         model = TaskLog
         fields = "__all__"
+
+
+class TaskSerializer(serializers.ModelSerializer):
+    template = TaskTemplateSerializer(read_only=True)
+    project = serializers.StringRelatedField()
+    timelogs = TaskTimeLogSerializer(many=True)
+
+    class Meta:
+        model = Task
+        fields = "__all__"
+        read_only_fields = ["project", "timelogs"]
+
+    def to_representation(self, instance):
+        res = super().to_representation(instance)
+        res['assigned_to'] = (
+            instance.assigned_to
+            and UserSerializer(instance=instance.assigned_to).data
+            or None
+        )
+        return res
