@@ -171,15 +171,6 @@ class LoginView(APIView):
                     'ACCESS_TOKEN_LIFETIME'
                 ).total_seconds(),
             )
-            response.set_cookie(
-                key="csrftoken",
-                value=get_token(request),
-                httponly=False,
-                secure=settings.SIMPLE_JWT.get('AUTH_COOKIE_SECURE', True),
-                samesite=settings.SIMPLE_JWT.get('AUTH_COOKIE_SAMESITE', 'Lax'),
-                max_age=3600,  # 1 hour
-            )
-            _logger.info(response.cookies)
             return response
         else:
             return Response(
@@ -193,7 +184,6 @@ class LogoutView(APIView):
         response = Response({"message": "Logout exitoso"})
         response.delete_cookie("refresh_token")
         response.delete_cookie("access_token")
-        response.delete_cookie("csrftoken")
         return response
 
 

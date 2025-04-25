@@ -1,6 +1,5 @@
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 import axios from "axios";
-import Cookies from "js-cookie";
 import toast from "react-hot-toast";
 
 const axiosInstance = axios.create({
@@ -8,22 +7,6 @@ const axiosInstance = axios.create({
   withCredentials: true,
   headers: { "Content-Type": "application/json" },
 });
-
-axiosInstance.interceptors.request.use(
-  (config) => {
-    const csrfToken = Cookies.get("csrftoken");
-
-    // Agregamos el header SOLO si el método lo necesita
-    const method = config.method?.toUpperCase();
-    const safeMethods = ["GET", "HEAD", "OPTIONS"];
-
-    if (!safeMethods.includes(method) && csrfToken) {
-      config.headers["X-CSRFToken"] = csrfToken;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
 
 axiosInstance.interceptors.response.use(
   (response) => response, // Pass through successful responses
