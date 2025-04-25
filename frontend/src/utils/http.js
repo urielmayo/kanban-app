@@ -1,6 +1,5 @@
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 import axios from "axios";
-import { data, redirect } from "react-router-dom";
 import Cookies from "js-cookie";
 import toast from "react-hot-toast";
 
