@@ -10,15 +10,45 @@ import {
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { createTaskTimeLog } from "../utils/http";
+import { useParams } from "react-router-dom";
 
-function TaskTimeLogDialog({ open, onClose, taskId }) {
-  const [hours, setHours] = useState("");
-  const [date, setDate] = useState(null);
+function TaskTimeLogDialog({ open, onClose }) {
+  const [taskForm, setTaskForm] = useState({
+    hours: "",
+    date: null,
+  });
+  const [errors, setErrors] = useState({});
+  const params = useParams();
+
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: createTaskTimeLog,
+    onSuccess: () => {
+      onClose();
+      queryClient.invalidateQueries({
+        queryKey: ["project", params.projectId, "task", params.taskId],
+      });
+    },
+    onError: (err) => {
+      setErrors(err.response?.data);
+    },
+  });
 
   const handleSubmit = () => {
     // Aquí puedes manejar el envío del registro de tiempo
-    console.log({ taskId, hours, date });
-    onClose();
+    const formData = {
+      hours: taskForm.hours,
+      date: taskForm.date ? taskForm.date.toISOString().split("T")[0] : null,
+    };
+
+    mutation.mutate({
+      projectId: params.projectId,
+      taskId: params.taskId,
+      data: formData,
+    });
   };
 
   return (
@@ -26,18 +56,26 @@ function TaskTimeLogDialog({ open, onClose, taskId }) {
       <DialogTitle>Add Time Log</DialogTitle>
       <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
         <TextField
+          required
           label="Hours"
           type="number"
-          value={hours}
-          onChange={(e) => setHours(e.target.value)}
+          value={taskForm.hours}
+          onChange={(e) => setTaskForm({ ...taskForm, hours: e.target.value })}
           fullWidth
+          error={!!errors.hours}
+          helperText={errors.hours}
         />
         <LocalizationProvider dateAdapter={AdapterDateFns}>
           <DatePicker
             label="Date"
-            value={date}
-            onChange={(newValue) => setDate(newValue)}
+            value={taskForm.date}
+            onChange={(newValue) =>
+              setTaskForm({ ...taskForm, date: newValue })
+            }
             renderInput={(params) => <TextField {...params} fullWidth />}
+            slotProps={(params) => <TextField {...params} fullWidth required />}
+            error={!!errors.date}
+            helperText={errors.date}
           />
         </LocalizationProvider>
       </DialogContent>

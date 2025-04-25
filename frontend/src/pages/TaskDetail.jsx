@@ -119,7 +119,6 @@ function TaskDetail() {
       <TaskTimeLogDialog
         open={isTimeLogDialogOpen}
         onClose={handleCloseTimeLogDialog}
-        taskId={task.id}
       />
     </Box>
   );

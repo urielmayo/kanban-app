@@ -1,6 +1,6 @@
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 import axios from "axios";
-import { redirect } from "react-router-dom";
+import { data, redirect } from "react-router-dom";
 import Cookies from "js-cookie";
 import toast from "react-hot-toast";
 
@@ -30,8 +30,12 @@ axiosInstance.interceptors.response.use(
   (response) => response, // Pass through successful responses
   (error) => {
     if (error.response?.status === 401) {
+      const isOnLoginPage = window.location.pathname === "/login";
+      if (!isOnLoginPage) {
+        // Redirige manualmente al login
+        window.location.href = "/login";
+      }
       // Redirect to login page on 401 error
-      redirect("/login");
     } else if (!error.response) {
       // Handle connection errors
       console.error("Network error: Unable to connect to the server.");
@@ -137,5 +141,13 @@ export const deleteTask = async ({ projectId, taskId }) => {
 
 export const getStatuses = async () => {
   const response = await axiosInstance.get("/api/statuses");
+  return response.data;
+};
+
+export const createTaskTimeLog = async ({ projectId, taskId, data }) => {
+  const response = await axiosInstance.post(
+    `/api/projects/${projectId}/tasks/${taskId}/add_time/`,
+    data
+  );
   return response.data;
 };
