@@ -1,5 +1,7 @@
+import { Breadcrumbs, Link as MuiLink, Typography, Box } from "@mui/material";
+
 import ProjectForm from "../components/ProjectForm";
-import { useParams, useNavigate } from "react-router";
+import { useParams, useNavigate, Link } from "react-router";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { getProjectDetail, updateProject } from "../utils/http";
 import LoadingComponent from "../components/LoadingComponent";
@@ -22,7 +24,7 @@ function EditProject() {
 
   const mutation = useMutation({
     mutationFn: updateProject,
-    onSuccess: () => navigate("/"),
+    onSuccess: () => navigate(`/projects/${id}`),
     onError: (err) => {
       setErrors(
         err.response.data || {
@@ -33,17 +35,30 @@ function EditProject() {
   });
 
   function handleSave(data) {
-    mutation.mutate({ id, data });
+    mutation.mutate({ id: id, data: data });
   }
 
   if (isLoading) return <LoadingComponent />;
   if (isError) return <ErrorComponent />;
 
   return (
-    <div>
-      <h1>Editar Proyecto</h1>
+    <Box sx={{ width: "100%", px: 3 }}>
+      <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 2 }}>
+        <MuiLink underline="hover" color="inherit" component={Link} to="/">
+          Projects
+        </MuiLink>
+        <MuiLink
+          underline="hover"
+          color="inherit"
+          component={Link}
+          to={`/projects/${id}`}
+        >
+          {project.name}
+        </MuiLink>
+        <Typography sx={{ color: "text.primary" }}>editar</Typography>
+      </Breadcrumbs>
       <ProjectForm project={project} onSave={handleSave} errors={errors} />
-    </div>
+    </Box>
   );
 }
 

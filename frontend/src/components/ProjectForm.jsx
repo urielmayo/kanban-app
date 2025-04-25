@@ -10,17 +10,38 @@ import {
 import StatusesComponent from "./StatusesComponent";
 
 const ProjectForm = ({ project = null, onSave, errors }) => {
-  const [name, setName] = useState(project?.name || "");
-  const [description, setDescription] = useState(project?.description || "");
-  const [statuses, setStatuses] = useState(project?.statuses || []);
+  const [formState, setFormState] = useState({
+    name: project?.name || "",
+    description: project?.description || "",
+    statuses:
+      project?.statuses.map((st) => ({
+        status: st.status.id,
+        order: st.order,
+      })) || [],
+  });
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormState((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
+  };
+
+  const handleStatusesChange = (updatedStatuses) => {
+    setFormState((prevState) => ({
+      ...prevState,
+      statuses: updatedStatuses,
+    }));
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSave({ name, description, statuses });
+    onSave(formState);
   };
 
   return (
-    <Container component="main" maxWidth="sm">
+    <Container component="main">
       <Paper elevation={3} sx={{ padding: 4, marginTop: 4 }}>
         <Typography component="h1" variant="h5" sx={{ marginBottom: 2 }}>
           {project ? "Actualizar Proyecto" : "Crear Proyecto"}
@@ -36,22 +57,32 @@ const ProjectForm = ({ project = null, onSave, errors }) => {
             required
             fullWidth
             id="name"
-            label="Nombre del Proyecto"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
+            name="name"
+            label="Project name"
+            value={formState.name}
+            onChange={handleInputChange}
+            error={!!errors.name}
+            helperText={errors.name}
           />
           <TextField
             margin="normal"
             required
             fullWidth
             id="description"
-            label="Descripción"
+            name="description"
+            label="Description"
             multiline
             rows={4}
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
+            value={formState.description}
+            onChange={handleInputChange}
+            error={!!errors.description}
+            helperText={errors.description}
           />
-          <StatusesComponent statuses={statuses} setStatuses={setStatuses} />
+          <StatusesComponent
+            statuses={formState.statuses}
+            setStatuses={handleStatusesChange}
+            errors={errors.statuses}
+          />
           <Button
             type="submit"
             fullWidth

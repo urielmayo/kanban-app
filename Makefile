@@ -1,3 +1,5 @@
+.PHONY: build-backend migrate test lint
+
 shell:
 	docker compose -f docker-compose.dev.yaml run --rm backend shell -v 2
 
@@ -21,3 +23,6 @@ clean:
 
 tests:
 	docker compose -f docker-compose.dev.yaml run --rm backend test
+
+build-backend:
+	docker compose -f docker-compose.dev.yaml build backend

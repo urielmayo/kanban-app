@@ -24,7 +24,7 @@ from .serializers import (
     UserSerializer,
     TaskTemplateSerializer,
 )
-from .permissions import IsMemberPermission
+from django.conf import settings
 
 import logging
 
@@ -35,7 +35,6 @@ _logger = logging.getLogger('django')
 class ProjectViewSet(viewsets.ModelViewSet):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
-    permission_classes = [permissions.IsAuthenticated, IsMemberPermission]
 
     def get_queryset(self):
         return self.queryset.filter(members=self.request.user)
@@ -44,10 +43,16 @@ class ProjectViewSet(viewsets.ModelViewSet):
         project = serializer.save()
         project.members.add(self.request.user)
 
+    @action(detail=True, methods=['get'])
+    def members(self, request, pk=None):
+        project = self.get_object()
+        members = project.members.all()
+        serializer = UserSerializer(members, many=True)
+        return Response(serializer.data)
+
 
 class StatusViewSet(viewsets.ModelViewSet):
     serializer_class = StatusSerializer
-    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         project_id = self.kwargs.get('project_pk')
@@ -61,12 +66,10 @@ class StatusViewSet(viewsets.ModelViewSet):
 class TaskTemplateViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = TaskTemplate.objects.all()
     serializer_class = TaskTemplateSerializer
-    permission_classes = [permissions.IsAuthenticated]
 
 
 class TaskViewSet(viewsets.ModelViewSet):
     serializer_class = TaskSerializer
-    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         project_id = self.kwargs.get('project_pk')
@@ -88,11 +91,18 @@ class TaskViewSet(viewsets.ModelViewSet):
         task.save()
         return Response(self.get_serializer(task).data)
 
+    @action(detail=True, methods=["POST"])
+    def add_time(self, request, project_pk=None, pk=None):
+        task = self.get_object()
+        serializer = TaskTimeLogSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(task=task, user=request.user)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
 
 class TaskCommentViewSet(viewsets.ModelViewSet):
     queryset = TaskComment.objects.all()
     serializer_class = TaskCommentSerializer
-    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         task_id = self.kwargs.get('task_pk')
@@ -106,7 +116,6 @@ class TaskCommentViewSet(viewsets.ModelViewSet):
 class TaskTimeLogViewSet(viewsets.ModelViewSet):
     queryset = TaskTimeLog.objects.all()
     serializer_class = TaskTimeLogSerializer
-    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         task_id = self.kwargs.get('task_pk')
@@ -139,28 +148,36 @@ class LoginView(APIView):
                 status=status.HTTP_200_OK,
             )
             response.set_cookie(
-                key="refresh_token",
+                key=settings.SIMPLE_JWT.get(
+                    'AUTH_COOKIE_REFRESH', 'refresh_token'
+                ),
                 value=str(refresh),
-                httponly=True,
-                secure=False,  # Change to True in production with HTTPS
-                samesite="Lax",
-                max_age=7 * 24 * 60 * 60,  # 7 days
+                httponly=settings.SIMPLE_JWT.get('AUTH_COOKIE_HTTP_ONLY', True),
+                secure=settings.SIMPLE_JWT.get('AUTH_COOKIE_SECURE', True),
+                samesite=settings.SIMPLE_JWT.get('AUTH_COOKIE_SAMESITE', 'Lax'),
+                path=settings.SIMPLE_JWT.get('AUTH_COOKIE_PATH', '/'),
+                max_age=settings.SIMPLE_JWT.get(
+                    'REFRESH_TOKEN_LIFETIME'
+                ).total_seconds(),
             )
             response.set_cookie(
-                key="access_token",
+                key=settings.SIMPLE_JWT.get('AUTH_COOKIE', 'access_token'),
                 value=str(refresh.access_token),
-                httponly=True,
-                secure=False,  # Change to True in production with HTTPS
-                samesite="Lax",
-                max_age=30 * 60,  # 30 minutes
+                httponly=settings.SIMPLE_JWT.get('AUTH_COOKIE_HTTP_ONLY', True),
+                secure=settings.SIMPLE_JWT.get('AUTH_COOKIE_SECURE', True),
+                samesite=settings.SIMPLE_JWT.get('AUTH_COOKIE_SAMESITE', 'Lax'),
+                path=settings.SIMPLE_JWT.get('AUTH_COOKIE_PATH', '/'),
+                max_age=settings.SIMPLE_JWT.get(
+                    'ACCESS_TOKEN_LIFETIME'
+                ).total_seconds(),
             )
             response.set_cookie(
                 key="csrftoken",
                 value=get_token(request),
                 httponly=False,
-                secure=False,  # True con HTTPS
-                samesite="Lax",
-                max_age=60 * 60,  # 1 hora
+                secure=settings.SIMPLE_JWT.get('AUTH_COOKIE_SECURE', True),
+                samesite=settings.SIMPLE_JWT.get('AUTH_COOKIE_SAMESITE', 'Lax'),
+                max_age=3600,  # 1 hour
             )
             return response
         else:
@@ -192,12 +209,14 @@ class RefreshTokenView(APIView):
 
             response = Response({"message": "Token refrescado"})
             response.set_cookie(
-                key="access_token",
+                key=settings.SIMPLE_JWT.get('AUTH_COOKIE', 'access_token'),
                 value=access_token,
-                httponly=True,
-                secure=False,
-                samesite="Lax",
-                max_age=30 * 60,  # 30 minutes
+                httponly=settings.SIMPLE_JWT.get('AUTH_COOKIE_HTTP_ONLY', True),
+                secure=settings.SIMPLE_JWT.get('AUTH_COOKIE_SECURE', True),
+                samesite=settings.SIMPLE_JWT.get('AUTH_COOKIE_SAMESITE', 'Lax'),
+                max_age=settings.SIMPLE_JWT.get(
+                    'ACCESS_TOKEN_LIFETIME'
+                ).total_seconds(),
             )
             return response
         except Exception:
@@ -211,7 +230,6 @@ class CreateUserView(generics.CreateAPIView):
 
 
 class UserProfileView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
         serializer = UserSerializer(request.user)
@@ -221,4 +239,3 @@ class UserProfileView(APIView):
 class StatusesListCreateView(generics.ListCreateAPIView):
     queryset = Status.objects.all()
     serializer_class = StatusSerializer
-    permission_classes = [permissions.IsAuthenticated]

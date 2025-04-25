@@ -26,7 +26,7 @@ CSRF_TRUSTED_ORIGINS = os.getenv(
 ).split(',')
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', "dev-insecure-secret-key")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 

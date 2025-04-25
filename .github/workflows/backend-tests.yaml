@@ -1,0 +1,19 @@
+name: Backend tests
+on:
+  push:
+    branches:
+      - dev
+jobs:
+  test-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build backend container
+        run: make build-backend
+
+      - name: Run migrations
+        run: make migrate
+
+      - name: Run tests
+        run: make tests

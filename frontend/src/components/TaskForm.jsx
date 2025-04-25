@@ -6,6 +6,7 @@ import {
   Autocomplete,
   Button,
   CircularProgress,
+  FormHelperText,
 } from "@mui/material";
 import MDEditor from "@uiw/react-md-editor";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
@@ -15,32 +16,40 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getTaskTemplates } from "../utils/http";
 import LoadingComponent from "./LoadingComponent";
+import ErrorComponent from "./ErrorComponent";
+import { useParams } from "react-router-dom";
+import { getProjectMembers } from "../utils/http";
 
-function TaskForm({
-  initialData = {},
-  projectMembers = [],
-  onSubmit,
-  isSubmitting,
-}) {
+function TaskForm({ initialData = {}, onSubmit, isSubmitting, errors }) {
+  const { id } = useParams();
   const [taskForm, setTaskForm] = useState(() => ({
-    title: initialData.title || "",
-    description: initialData.description || "",
+    title: initialData?.title || "",
+    description: initialData?.description || "",
     deadline: initialData.deadline ? new Date(initialData.deadline) : null,
-    assigned_to: initialData.assigned_to || "",
+    assigned_to: initialData?.assigned_to?.id || "",
     template: "",
   }));
 
-  const { data: templates, isLoading: isLoadingTemplates } = useQuery({
+  const {
+    data: templates,
+    isLoading: isLoadingTemplates,
+    isError: isErrorTemplates,
+  } = useQuery({
     queryFn: getTaskTemplates,
     queryKey: ["templates"],
   });
 
-  const handleSubmit = () => {
-    if (!taskForm.title || !taskForm.deadline) {
-      console.error("Form validation failed. Required fields missing.");
-      return;
-    }
+  const {
+    data: members,
+    isLoading: isLoadingMembers,
+    isError: isErrorMembers,
+  } = useQuery({
+    queryFn: async () => getProjectMembers(id),
+    queryKey: ["project", id, "members"],
+  });
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
     const taskPayload = {
       title: taskForm.title,
       description: taskForm.description,
@@ -49,25 +58,31 @@ function TaskForm({
         : null,
       assigned_to: taskForm.assigned_to || null,
     };
-
     onSubmit(taskPayload);
   };
 
-  if (isLoadingTemplates) {
-    return <LoadingComponent />;
-  }
+  const isLoading = isLoadingMembers && isLoadingTemplates;
+
+  if (isLoading) return <LoadingComponent />;
+  if (isErrorTemplates) return <ErrorComponent />;
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", gap: 2, pt: 2 }}>
+    <Box
+      sx={{ display: "flex", flexDirection: "column", gap: 2, pt: 2 }}
+      component="form"
+      onSubmit={handleSubmit}
+    >
       <TextField
         sx={{ backgroundColor: "white" }}
         label="Task Title"
         fullWidth
-        required
         value={taskForm.title}
         onChange={(e) => setTaskForm({ ...taskForm, title: e.target.value })}
+        error={!!errors.title}
+        helperText={errors.title}
       />
       <Autocomplete
+        disabled={!templates}
         options={templates}
         getOptionLabel={(option) => option.name}
         renderInput={(params) => <TextField {...params} label="Template" />}
@@ -84,8 +99,11 @@ function TaskForm({
         onChange={(value) =>
           setTaskForm({ ...taskForm, description: value || "" })
         }
-        preview="edit"
+        preview="live"
       />
+      {errors?.description && (
+        <FormHelperText error>{errors.description}</FormHelperText>
+      )}
       <Typography variant="caption" display="block">
         Markdown supported -{" "}
         <Link
@@ -104,16 +122,17 @@ function TaskForm({
             setTaskForm({ ...taskForm, deadline: newValue })
           }
           slotProps={(params) => <TextField {...params} fullWidth required />}
+          error={!!errors.deadline}
+          helperText={errors.deadline}
         />
       </LocalizationProvider>
       <Autocomplete
+        disabled={!members}
         fullWidth
-        options={projectMembers || []}
+        options={members}
         getOptionLabel={(option) => `${option.first_name} ${option.last_name}`}
         value={
-          projectMembers?.find(
-            (member) => member.id === taskForm.assigned_to
-          ) || null
+          members?.find((member) => member.id === taskForm.assigned_to) || null
         }
         onChange={(event, newValue) => {
           setTaskForm({
@@ -124,11 +143,7 @@ function TaskForm({
         renderInput={(params) => <TextField {...params} label="Assign To" />}
       />
       <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2 }}>
-        <Button
-          onClick={handleSubmit}
-          variant="contained"
-          disabled={isSubmitting}
-        >
+        <Button type="submit" variant="contained" disabled={isSubmitting}>
           {isSubmitting ? <CircularProgress size={24} /> : "Submit"}
         </Button>
       </Box>

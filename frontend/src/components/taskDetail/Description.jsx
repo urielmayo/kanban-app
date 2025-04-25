@@ -17,10 +17,12 @@ const TaskDescription = ({ description }) => {
             backgroundColor: "#f9f9f9",
           }}
         >
-          <MDEditor.Markdown
-            source={description || "No description"}
-            data-color-mode="light"
-          />
+          <div data-color-mode="light">
+            <MDEditor.Markdown
+              source={description || "No description"}
+              data-color-mode="light"
+            />
+          </div>
         </Box>
       </CardContent>
     </Card>
