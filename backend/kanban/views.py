@@ -179,6 +179,7 @@ class LoginView(APIView):
                 samesite=settings.SIMPLE_JWT.get('AUTH_COOKIE_SAMESITE', 'Lax'),
                 max_age=3600,  # 1 hour
             )
+            _logger.info(response.cookies)
             return response
         else:
             return Response(
