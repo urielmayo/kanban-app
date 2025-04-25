@@ -10,7 +10,7 @@ from botocore.exceptions import ClientError
 
 def get_aws_parameter(name):
     """Get parameter from AWS Parameter Store"""
-    ssm = boto3.client('ssm')
+    ssm = boto3.client("ssm", region_name="sa-east-1")
     try:
         response = ssm.get_parameter(Name=name, WithDecryption=True)
         return response['Parameter']['Value']
