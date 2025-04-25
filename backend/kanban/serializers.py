@@ -217,12 +217,22 @@ class TaskLogSerializer(serializers.ModelSerializer):
 class TaskSerializer(serializers.ModelSerializer):
     template = TaskTemplateSerializer(read_only=True)
     project = serializers.StringRelatedField()
-    timelogs = TaskTimeLogSerializer(many=True)
+    timelogs = TaskTimeLogSerializer(many=True, read_only=True)
 
     class Meta:
         model = Task
-        fields = "__all__"
-        read_only_fields = ["project", "timelogs"]
+        fields = [
+            "id",
+            "project",
+            "title",
+            "description",
+            "assigned_to",
+            "status",
+            "deadline",
+            "created_at",
+            "timelogs",
+        ]
+        read_only_fields = ["project"]
 
     def to_representation(self, instance):
         res = super().to_representation(instance)
