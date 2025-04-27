@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import SubmitButton from "../components/UI/SubmitButton";
 
 function Signup() {
   const [formData, setFormData] = useState({
@@ -150,14 +151,14 @@ function Signup() {
               error={!!errors.confirmPassword}
               helperText={errors.confirmPassword}
             />
-            <Button
+            <SubmitButton
               type="submit"
               fullWidth
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
-            >
-              Sign Up
-            </Button>
+              text="Sign Up"
+              isPending={mutation.isPending}
+            />
             <Box sx={{ textAlign: "center" }}>
               <Link component={RouterLink} to="/login" variant="body2">
                 {"Already have an account? Sign in"}

@@ -9,7 +9,7 @@ function AddTask({ open, onClose, projectMembers, projectId, statusId }) {
   const [errors, setErrors] = useState({});
   const queryClient = useQueryClient();
 
-  const { mutate, isLoading: isCreatingTask } = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationFn: createTask,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["project", projectId] });
@@ -31,7 +31,7 @@ function AddTask({ open, onClose, projectMembers, projectId, statusId }) {
         <TaskForm
           projectMembers={projectMembers}
           onSubmit={handleSubmit}
-          isSubmitting={isCreatingTask}
+          isPending={isPending}
           errors={errors}
         />
       </DialogContent>

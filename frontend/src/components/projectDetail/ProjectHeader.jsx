@@ -17,6 +17,9 @@ import { useNavigate, useParams } from "react-router";
 import { useMutation } from "@tanstack/react-query";
 import { deleteProject } from "../../utils/http";
 import { useState } from "react";
+import toast from "react-hot-toast";
+
+import SubmitButton from "../UI/SubmitButton";
 
 function ProjectHeader({ name, description }) {
   const navigate = useNavigate();
@@ -25,13 +28,12 @@ function ProjectHeader({ name, description }) {
 
   const mutation = useMutation({
     mutationFn: deleteProject,
-    onSuccess: () => navigate(".."),
+    onSuccess: () => {
+      setOpenConfirmDialog(false);
+      toast.success("Proyecto eliminado con exito");
+      navigate("..");
+    },
   });
-
-  const handleDeleteProject = () => {
-    mutation.mutate(id);
-    setOpenConfirmDialog(false);
-  };
 
   return (
     <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
@@ -81,9 +83,13 @@ function ProjectHeader({ name, description }) {
           >
             Cancel
           </Button>
-          <Button onClick={handleDeleteProject} color="error" autoFocus>
-            Delete
-          </Button>
+          <SubmitButton
+            onClick={() => mutation.mutate(id)}
+            color="error"
+            autoFocus
+            text="Delete"
+            isPending={mutation.isPending}
+          />
         </DialogActions>
       </Dialog>
     </Box>

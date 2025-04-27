@@ -43,7 +43,7 @@ function TaskEdit({ open, onClose, taskId }) {
         <TaskForm
           initialData={task}
           onSubmit={handleSubmit}
-          isSubmitting={isUpdatingTask}
+          isPending={isUpdatingTask}
           errors={errors}
         />
       </DialogContent>

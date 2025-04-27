@@ -3,6 +3,7 @@ import ProjectForm from "../components/ProjectForm";
 import { useNavigate } from "react-router-dom";
 import { createProject } from "../utils/http";
 import { useState } from "react";
+import toast from "react-hot-toast";
 
 const CreateProject = () => {
   const [errors, setErrors] = useState({});
@@ -10,7 +11,10 @@ const CreateProject = () => {
 
   const mutation = useMutation({
     mutationFn: createProject,
-    onSuccess: () => navigate("/"),
+    onSuccess: (resp) => {
+      toast.success("Project created successfully");
+      navigate(`/projects/${resp.id}`);
+    },
     onError: (err) => {
       setErrors(
         err.response.data || {
@@ -24,7 +28,13 @@ const CreateProject = () => {
     mutation.mutate(params);
   };
 
-  return <ProjectForm onSave={handleSave} errors={errors} />;
+  return (
+    <ProjectForm
+      onSave={handleSave}
+      errors={errors}
+      isPending={mutation.isPending}
+    />
+  );
 };
 
 export default CreateProject;

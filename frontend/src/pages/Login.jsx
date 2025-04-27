@@ -12,6 +12,8 @@ import {
 import { useAuth } from "../context/AuthContext";
 import { useMutation } from "@tanstack/react-query";
 
+import SubmitButton from "../components/UI/SubmitButton";
+
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -96,14 +98,14 @@ function Login() {
               error={!!errors.password}
               helperText={errors.password}
             />
-            <Button
+            <SubmitButton
               type="submit"
               fullWidth
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
-            >
-              Sign In
-            </Button>
+              isPending={mutation.isPending}
+              text="Sign In"
+            />
             <Box sx={{ textAlign: "center" }}>
               <Link component={RouterLink} to="/signup" variant="body2">
                 {"Don't have an account? Sign Up"}

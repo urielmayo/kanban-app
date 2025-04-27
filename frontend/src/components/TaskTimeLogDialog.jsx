@@ -13,6 +13,8 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createTaskTimeLog } from "../utils/http";
 import { useParams } from "react-router-dom";
+import toast from "react-hot-toast";
+import SubmitButton from "./UI/SubmitButton";
 
 function TaskTimeLogDialog({ open, onClose }) {
   const [taskForm, setTaskForm] = useState({
@@ -27,10 +29,11 @@ function TaskTimeLogDialog({ open, onClose }) {
   const mutation = useMutation({
     mutationFn: createTaskTimeLog,
     onSuccess: () => {
-      onClose();
+      toast.success("Timelog registered succesfully");
       queryClient.invalidateQueries({
         queryKey: ["project", params.projectId, "task", params.taskId],
       });
+      onClose();
     },
     onError: (err) => {
       setErrors(err.response?.data);
@@ -81,9 +84,12 @@ function TaskTimeLogDialog({ open, onClose }) {
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Cancel</Button>
-        <Button onClick={handleSubmit} variant="contained">
-          Save
-        </Button>
+        <SubmitButton
+          onClick={handleSubmit}
+          variant="contained"
+          text="Save"
+          isPending={mutation.isPending}
+        />
       </DialogActions>
     </Dialog>
   );
