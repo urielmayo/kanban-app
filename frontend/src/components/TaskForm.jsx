@@ -20,7 +20,9 @@ import ErrorComponent from "./ErrorComponent";
 import { useParams } from "react-router-dom";
 import { getProjectMembers } from "../utils/http";
 
-function TaskForm({ initialData = {}, onSubmit, isSubmitting, errors }) {
+import SubmitButton from "./UI/SubmitButton";
+
+function TaskForm({ initialData = {}, onSubmit, isPending, errors }) {
   const { id } = useParams();
   const [taskForm, setTaskForm] = useState(() => ({
     title: initialData?.title || "",
@@ -143,9 +145,7 @@ function TaskForm({ initialData = {}, onSubmit, isSubmitting, errors }) {
         renderInput={(params) => <TextField {...params} label="Assign To" />}
       />
       <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2 }}>
-        <Button type="submit" variant="contained" disabled={isSubmitting}>
-          {isSubmitting ? <CircularProgress size={24} /> : "Submit"}
-        </Button>
+        <SubmitButton isPending={isPending} text="Submit" variant="contained" />
       </Box>
     </Box>
   );

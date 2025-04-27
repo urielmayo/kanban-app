@@ -2,10 +2,10 @@ from rest_framework import viewsets, permissions, status, generics
 from rest_framework.decorators import action
 from django.contrib.auth import authenticate
 from rest_framework.response import Response
-from django.middleware.csrf import get_token
 from django.shortcuts import get_object_or_404
 from .models import (
     Project,
+    ProjectStatus,
     Task,
     Status,
     TaskComment,
@@ -85,9 +85,18 @@ class TaskViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['post'])
     def move(self, request, project_pk=None, pk=None):
         task = self.get_object()
-        new_status_id = request.data.get('status')
-        new_status = get_object_or_404(Status, id=new_status_id)
-        task.status = new_status
+        direction = request.data.get('direction') == "forward" and 1 or -1
+        current_status = get_object_or_404(
+            ProjectStatus,
+            project=task.project,
+            status=task.status,
+        )
+        next_status = get_object_or_404(
+            ProjectStatus,
+            project=task.project,
+            order=current_status.order + direction,
+        )
+        task.status = next_status.status
         task.save()
         return Response(self.get_serializer(task).data)
 

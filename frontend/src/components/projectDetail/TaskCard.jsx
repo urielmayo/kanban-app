@@ -45,7 +45,7 @@ function TaskCard({ task, isFirstStage, isLastStage }) {
     updateTaskmutation.mutate({
       projectId: params.id,
       taskId: task.id,
-      statusId: task.status + 1,
+      direction: "forward",
     });
   };
 
@@ -53,7 +53,7 @@ function TaskCard({ task, isFirstStage, isLastStage }) {
     updateTaskmutation.mutate({
       projectId: params.id,
       taskId: task.id,
-      statusId: task.status - 1,
+      direction: "backguard",
     });
   };
 

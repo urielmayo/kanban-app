@@ -2,13 +2,14 @@ import { Breadcrumbs, Link as MuiLink, Typography, Box } from "@mui/material";
 
 import ProjectForm from "../components/ProjectForm";
 import { useParams, useNavigate, Link } from "react-router";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getProjectDetail, updateProject } from "../utils/http";
 import LoadingComponent from "../components/LoadingComponent";
 import ErrorComponent from "../components/ErrorComponent";
 import { useState } from "react";
 
 function EditProject() {
+  const queryClient = useQueryClient();
   const { id } = useParams();
   const navigate = useNavigate();
   const [errors, setErrors] = useState({});
@@ -24,7 +25,10 @@ function EditProject() {
 
   const mutation = useMutation({
     mutationFn: updateProject,
-    onSuccess: () => navigate(`/projects/${id}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["project", id] });
+      navigate(`/projects/${id}`);
+    },
     onError: (err) => {
       setErrors(
         err.response.data || {
@@ -57,7 +61,12 @@ function EditProject() {
         </MuiLink>
         <Typography sx={{ color: "text.primary" }}>editar</Typography>
       </Breadcrumbs>
-      <ProjectForm project={project} onSave={handleSave} errors={errors} />
+      <ProjectForm
+        project={project}
+        onSave={handleSave}
+        errors={errors}
+        isPending={mutation.isPending}
+      />
     </Box>
   );
 }

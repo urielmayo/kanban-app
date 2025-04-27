@@ -1,15 +1,9 @@
 import { useState } from "react";
-import {
-  Box,
-  Button,
-  Container,
-  TextField,
-  Typography,
-  Paper,
-} from "@mui/material";
+import { Box, Container, TextField, Typography, Paper } from "@mui/material";
 import StatusesComponent from "./StatusesComponent";
+import SubmitButton from "./UI/SubmitButton";
 
-const ProjectForm = ({ project = null, onSave, errors }) => {
+const ProjectForm = ({ project = null, onSave, errors, isPending }) => {
   const [formState, setFormState] = useState({
     name: project?.name || "",
     description: project?.description || "",
@@ -44,7 +38,7 @@ const ProjectForm = ({ project = null, onSave, errors }) => {
     <Container component="main">
       <Paper elevation={3} sx={{ padding: 4, marginTop: 4 }}>
         <Typography component="h1" variant="h5" sx={{ marginBottom: 2 }}>
-          {project ? "Actualizar Proyecto" : "Crear Proyecto"}
+          {`${project ? "Update" : "Create"} project`}
         </Typography>
         <Box component="form" onSubmit={handleSubmit}>
           {errors?.non_field_errors && (
@@ -83,14 +77,14 @@ const ProjectForm = ({ project = null, onSave, errors }) => {
             setStatuses={handleStatusesChange}
             errors={errors.statuses}
           />
-          <Button
+          <SubmitButton
             type="submit"
             fullWidth
             variant="contained"
             sx={{ mt: 3, mb: 2 }}
-          >
-            {project ? "Actualizar" : "Crear"} Proyecto
-          </Button>
+            isPending={isPending}
+            text={project ? "UPDATE" : "CREATE"}
+          />
         </Box>
       </Paper>
     </Container>
