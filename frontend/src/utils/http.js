@@ -63,13 +63,11 @@ export const getProjectDetail = async (projectId) => {
 
 export const createProject = async (data) => {
   const response = await axiosInstance.post("/api/projects/", data);
-  toast.success("Proyect created successfully");
   return response.data;
 };
 
 export const deleteProject = async (id) => {
   await axiosInstance.delete(`/api/projects/${id}/`);
-  toast.success("Proyecto eliminado con exito");
   return { success: true };
 };
 
@@ -107,10 +105,10 @@ export const updateTask = async ({ projectId, taskId, data }) => {
   return response.data;
 };
 
-export const updateTaskStatus = async ({ projectId, taskId, statusId }) => {
+export const updateTaskStatus = async ({ projectId, taskId, direction }) => {
   const response = await axiosInstance.post(
     `/api/projects/${projectId}/tasks/${taskId}/move/`,
-    { status: statusId }
+    { direction }
   );
   toast.success("Successfull moved task");
   return response.data;
